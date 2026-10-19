@@ -9,17 +9,17 @@ import Hero from "@/components/Hero";
 import Meches from "@/components/Meches";
 import Newsletter from "@/components/Newsletter";
 import Promo from "@/components/Promo";
+import MobileTabBar from "@/components/MobileTabBar";
 import Sprite from "@/components/Sprite";
 import { createClient } from "@/lib/supabase/server";
 import { PRODUCT_SELECT, type Product } from "@/lib/types";
 
-export default async function Home() {
+export default async function Home({ searchParams }: { searchParams: { q?: string } }) {
+  const query = (searchParams.q ?? "").replace(/[%_,()]/g, " ").trim().slice(0, 60);
   const supabase = createClient();
-  const { data } = await supabase
-    .from("products")
-    .select(PRODUCT_SELECT)
-    .eq("is_active", true)
-    .order("created_at", { ascending: false });
+  let request = supabase.from("products").select(PRODUCT_SELECT).eq("is_active", true);
+  if (query) request = request.ilike("name", `%${query}%`);
+  const { data } = await request.order("created_at", { ascending: false });
   const products = (data ?? []) as unknown as Product[];
 
   return (
@@ -29,13 +29,14 @@ export default async function Home() {
       <Hero />
       <Categories />
       <Features />
-      <Bestsellers products={products} />
+      <Bestsellers products={products} query={query} />
       <Promo />
       <Meches />
       <Gallery />
       <AppTeaser />
       <Newsletter />
       <Footer />
+      <MobileTabBar />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { safeNext } from "@/lib/auth";
 import BackButton from "@/components/BackButton";
 import Icon from "@/components/Icon";
 import Sprite from "@/components/Sprite";
@@ -25,14 +26,29 @@ function LoginForm() {
     setLoading(true);
     setError("");
     const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error || !data.user) {
       setError("E-mail ou mot de passe incorrect.");
       setLoading(false);
       return;
     }
-    const next = params.get("next");
-    router.replace(next && next.startsWith("/admin") ? next : "/admin");
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", data.user.id)
+      .maybeSingle();
+    const isAdmin = profile?.role === "admin";
+
+    // Admin : /admin par défaut. Cliente : jamais /admin, retour à la page demandée ou /compte.
+    const next = safeNext(params.get("next"));
+    const dest = isAdmin
+      ? next ?? "/admin"
+      : next && !next.startsWith("/admin")
+        ? next
+        : "/compte";
+
+    router.replace(dest);
     router.refresh();
   }
 
@@ -79,12 +95,15 @@ export default function LoginPage() {
           GLOW
         </Link>
         <span className="eyebrow" style={{ marginTop: 22, display: "block" }}>
-          Espace admin
+          Mon compte
         </span>
         <h1>Connexion</h1>
         <Suspense>
           <LoginForm />
         </Suspense>
+        <p className="login-alt">
+          Pas encore de compte ? <Link href="/inscription">Créer mon compte</Link>
+        </p>
       </div>
     </div>
   );

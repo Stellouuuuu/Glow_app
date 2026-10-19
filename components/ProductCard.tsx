@@ -38,8 +38,14 @@ export default function ProductCard({ product }: { product: Product }) {
               <span className="price-old">{formatPrice(product.old_price)}</span>
             ) : null}
           </div>
+          {outOfStock && <span className="prod-out">Rupture de stock</span>}
         </div>
       </Link>
+      {!outOfStock && (
+        <button type="button" className="prod-mini" onClick={add} aria-label={`Ajouter ${product.name} au panier`}>
+          <Icon name="i-cart" />
+        </button>
+      )}
       <div className="prod-actions">
         {outOfStock ? (
           <button type="button" className="add-btn" disabled style={{ opacity: 0.6, cursor: "not-allowed" }}>

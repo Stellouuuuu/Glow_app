@@ -3,16 +3,16 @@ import Icon from "./Icon";
 import ProductCard from "./ProductCard";
 import type { Product } from "@/lib/types";
 
-export default function Bestsellers({ products }: { products: Product[] }) {
+export default function Bestsellers({ products, query }: { products: Product[]; query?: string }) {
   return (
     <section className="sec wrap" id="bestsellers">
       <div className="sec-head">
         <div>
-          <span className="eyebrow">Les chouchous</span>
-          <h2>Nos meilleures ventes</h2>
+          <span className="eyebrow">{query ? "Recherche" : "Les chouchous"}</span>
+          <h2>{query ? `Résultats pour « ${query} »` : "Nos meilleures ventes"}</h2>
         </div>
         <Link href="/#bestsellers" className="btn btn-ghost">
-          Tout voir <Icon name="i-arrow" />
+          {query ? "Effacer la recherche" : "Tout voir"} <Icon name="i-arrow" />
         </Link>
       </div>
       {products.length > 0 ? (
@@ -22,7 +22,9 @@ export default function Bestsellers({ products }: { products: Product[] }) {
           ))}
         </div>
       ) : (
-        <p style={{ color: "var(--ink-soft)" }}>Les nouveautés arrivent très bientôt.</p>
+        <p style={{ color: "var(--ink-soft)" }}>
+          {query ? "Aucun produit ne correspond à ta recherche." : "Les nouveautés arrivent très bientôt."}
+        </p>
       )}
     </section>
   );

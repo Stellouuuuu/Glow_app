@@ -26,19 +26,46 @@ export default function OrderButtons({ product }: { product: Product }) {
   );
 
   // Trace discrète de la commande, sans bloquer l'ouverture de WhatsApp.
-  function logOrder() {
-    createClient()
-      .from("orders")
-      .insert({
-        customer_name: "Client WhatsApp",
-        customer_phone: "inconnu",
-        product_id: product.id,
-        quantity: 1,
-        total_price: product.price,
-        status: "en_attente",
-        source: "whatsapp",
-      })
-      .then(() => {});
+  // Si la cliente est connectée, la commande est rattachée à son compte.
+  async function logOrder() {
+    const supabase = createClient();
+    const order = {
+      customer_name: "Client WhatsApp",
+      customer_phone: "inconnu",
+      product_id: product.id,
+      quantity: 1,
+      total_price: product.price,
+      status: "en_attente",
+      source: "whatsapp",
+    };
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      await supabase.from("orders").insert(order);
+      return;
+    }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("full_name, phone")
+      .eq("id", user.id)
+      .maybeSingle();
+    const { error } = await supabase.from("orders").insert({
+      ...order,
+      customer_name: profile?.full_name || order.customer_name,
+      customer_phone: profile?.phone || order.customer_phone,
+      user_id: user.id,
+    });
+    // Colonne user_id absente ou refusée : on enregistre quand même la commande.
+    if (error) {
+      await supabase.from("orders").insert({
+        ...order,
+        customer_name: profile?.full_name || order.customer_name,
+        customer_phone: profile?.phone || order.customer_phone,
+      });
+    }
   }
 
   return (

@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Icon from "@/components/Icon";
 import OrderButtons from "@/components/OrderButtons";
+import MobileTabBar from "@/components/MobileTabBar";
 import Sprite from "@/components/Sprite";
 import { formatPrice, illustrationFor } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
@@ -75,6 +76,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
         </div>
       </main>
       <Footer />
+      <MobileTabBar />
     </div>
   );
 }

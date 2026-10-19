@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import AccountMenu from "./AccountMenu";
 import Icon from "./Icon";
+import MobileSearch from "./MobileSearch";
 import { useCart } from "./CartProvider";
 
 const BRAND = "GLOW";
@@ -46,9 +48,7 @@ export default function Header() {
             <button type="button" className="icon-btn" aria-label="Rechercher">
               <Icon name="i-search" />
             </button>
-            <Link href="/#top" className="icon-btn" aria-label="Mon compte">
-              <Icon name="i-user" />
-            </Link>
+            <AccountMenu />
             <button
               type="button"
               className="icon-btn"
@@ -75,6 +75,8 @@ export default function Header() {
             </button>
           </div>
         </div>
+
+        <MobileSearch />
 
         <div className={`mobile-panel ${navOpen ? "open" : ""}`}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -120,6 +122,17 @@ export default function Header() {
           </Link>
         </div>
       </header>
+
+      <div className="reassure">
+        <span>
+          <Icon name="i-shield" />
+          Livraison rapide
+        </span>
+        <span>
+          <Icon name="i-cash" />
+          Paiement à la livraison
+        </span>
+      </div>
     </>
   );
 }
