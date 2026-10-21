@@ -7,6 +7,7 @@ export type Product = {
   old_price: number | null;
   stock: number;
   photo_url: string | null;
+  photos?: string[] | null;
   badge: string | null;
   is_active: boolean;
   categories: { name: string; slug: string } | null;
@@ -26,6 +27,7 @@ export type AdminProduct = {
   old_price: number | null;
   stock: number;
   photo_url: string | null;
+  photos: string[] | null;
   badge: string | null;
   is_active: boolean;
   category_id: string | null;
@@ -33,7 +35,7 @@ export type AdminProduct = {
 };
 
 export const ADMIN_PRODUCT_SELECT =
-  "id, slug, name, description, price, old_price, stock, photo_url, badge, is_active, category_id, categories(name)";
+  "id, slug, name, description, price, old_price, stock, photo_url, photos, badge, is_active, category_id, categories(name)";
 
 export const LOW_STOCK = 3;
 

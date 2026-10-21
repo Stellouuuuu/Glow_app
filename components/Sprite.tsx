@@ -145,7 +145,7 @@ const defs = `
 export default function Sprite() {
   return (
     <svg
-      style={{ display: "none" }}
+      style={{ position: "absolute", width: 0, height: 0, overflow: "hidden" }}
       aria-hidden="true"
       dangerouslySetInnerHTML={{ __html: defs }}
     />

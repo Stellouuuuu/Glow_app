@@ -20,9 +20,7 @@ const config: Config = {
         gold: "#C98B6B",
       },
       fontFamily: {
-        display: ["var(--font-fraunces)", "serif"],
-        sans: ["var(--font-poppins)", "sans-serif"],
-        script: ["var(--font-script)", "cursive"],
+        sans: ["var(--font-jost)", "-apple-system", "system-ui", "Helvetica Neue", "Arial", "sans-serif"],
       },
     },
   },

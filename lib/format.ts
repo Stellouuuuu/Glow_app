@@ -1,5 +1,9 @@
+export function formatAmount(value: number) {
+  return String(value).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+}
+
 export function formatPrice(value: number) {
-  return `${String(value).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} FCFA`;
+  return `${formatAmount(value)} FCFA`;
 }
 
 // Illustration de secours quand le produit n'a pas encore de photo.

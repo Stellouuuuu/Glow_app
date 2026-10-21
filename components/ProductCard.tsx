@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Icon from "./Icon";
 import { useCart } from "./CartProvider";
-import { formatPrice, illustrationFor } from "@/lib/format";
+import { formatAmount, formatPrice, illustrationFor } from "@/lib/format";
 import type { Product } from "@/lib/types";
 
 export default function ProductCard({ product }: { product: Product }) {
@@ -30,10 +30,12 @@ export default function ProductCard({ product }: { product: Product }) {
           )}
         </div>
         <div className="prod-body">
-          {product.categories && <span className="prod-cat">{product.categories.name}</span>}
           <h3 className="prod-name">{product.name}</h3>
           <div className="price-row">
-            <span className="price">{formatPrice(product.price)}</span>
+            <span className="price">
+              {formatAmount(product.price)}
+              <small>FCFA</small>
+            </span>
             {product.old_price ? (
               <span className="price-old">{formatPrice(product.old_price)}</span>
             ) : null}
@@ -46,18 +48,6 @@ export default function ProductCard({ product }: { product: Product }) {
           <Icon name="i-cart" />
         </button>
       )}
-      <div className="prod-actions">
-        {outOfStock ? (
-          <button type="button" className="add-btn" disabled style={{ opacity: 0.6, cursor: "not-allowed" }}>
-            Rupture de stock
-          </button>
-        ) : (
-          <button type="button" className="add-btn" onClick={add}>
-            <Icon name="i-cart" />
-            Ajouter au panier
-          </button>
-        )}
-      </div>
     </article>
   );
 }

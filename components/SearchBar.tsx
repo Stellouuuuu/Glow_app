@@ -15,7 +15,7 @@ function SearchForm() {
   }
 
   return (
-    <form className="mobile-search-form" onSubmit={onSubmit} role="search">
+    <form className="search-form" onSubmit={onSubmit} role="search">
       <input
         type="search"
         placeholder="Rechercher un produit..."
@@ -30,9 +30,9 @@ function SearchForm() {
   );
 }
 
-export default function MobileSearch() {
+export default function SearchBar() {
   return (
-    <div className="mobile-search">
+    <div className="search-box">
       <Suspense>
         <SearchForm />
       </Suspense>

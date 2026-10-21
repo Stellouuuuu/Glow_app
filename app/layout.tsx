@@ -1,24 +1,13 @@
 import type { Metadata } from "next";
-import { Dancing_Script, Fraunces, Poppins } from "next/font/google";
+import localFont from "next/font/local";
 import CartProvider from "@/components/CartProvider";
 import "./globals.css";
 
-const fraunces = Fraunces({
-  subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600"],
-  variable: "--font-fraunces",
-  display: "swap",
-});
-const poppins = Poppins({
-  subsets: ["latin", "latin-ext"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-poppins",
-  display: "swap",
-});
-const dancingScript = Dancing_Script({
-  subsets: ["latin", "latin-ext"],
-  weight: ["600", "700"],
-  variable: "--font-script",
+// Jost (police de SHEIN, licence SIL OFL) servie localement : pas de dépendance réseau au build.
+const jost = localFont({
+  src: "./fonts/Jost-Latin-Variable.woff2",
+  weight: "100 900",
+  variable: "--font-jost",
   display: "swap",
 });
 
@@ -34,10 +23,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr">
-      <body
-        className={`${fraunces.variable} ${poppins.variable} ${dancingScript.variable}`}
-      >
+    <html lang="fr" className={jost.variable}>
+      <body>
         <CartProvider>{children}</CartProvider>
       </body>
     </html>

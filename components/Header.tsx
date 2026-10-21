@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import AccountMenu from "./AccountMenu";
 import Icon from "./Icon";
-import MobileSearch from "./MobileSearch";
+import SearchBar from "./SearchBar";
 import { useCart } from "./CartProvider";
 
 const BRAND = "GLOW";
@@ -12,9 +12,18 @@ const BRAND = "GLOW";
 const mobileLinks = [
   { href: "/#top", label: "Accueil" },
   { href: "/#categories", label: "Beauté" },
-  { href: "/#promo", label: "Mode" },
-  { href: "/#meches", label: "Mèches & Extensions" },
+  { href: "/#bestsellers", label: "Mode" },
+  { href: "/#bestsellers", label: "Mèches & Extensions" },
   { href: "/#bestsellers", label: "Nouveautés" },
+  { href: "/#footer", label: "Contact" },
+];
+
+const desktopLinks = [
+  { href: "/#categories", label: "Catégories" },
+  { href: "/#bestsellers", label: "Nouveautés" },
+  { href: "/#categories", label: "Beauté" },
+  { href: "/#bestsellers", label: "Mode" },
+  { href: "/#bestsellers", label: "Mèches" },
   { href: "/#footer", label: "Contact" },
 ];
 
@@ -26,8 +35,26 @@ export default function Header() {
   return (
     <>
       <div className="announce">
-        Livraison offerte dès 25 000 FCFA<span>•</span>Nouveautés chaque semaine
-        <span>•</span>Paiement à la livraison disponible
+        <div className="wrap announce-row">
+          <span className="announce-item">
+            <Icon name="i-truck" />
+            <span>
+              <strong>Livraison offerte</strong> dès 25 000 FCFA
+            </span>
+          </span>
+          <span className="announce-item">
+            <Icon name="i-cash" />
+            <span>
+              <strong>Paiement à la livraison</strong> disponible
+            </span>
+          </span>
+          <span className="announce-item">
+            <Icon name="i-refresh" />
+            <span>
+              <strong>Retours faciles</strong> sous 7 jours
+            </span>
+          </span>
+        </div>
       </div>
 
       <header className="site">
@@ -36,18 +63,8 @@ export default function Header() {
             <Icon name="i-flower" />
             {BRAND}
           </Link>
-          <nav className="nav-links" aria-label="Navigation principale">
-            <Link href="/#top">Accueil</Link>
-            <Link href="/#categories">Beauté</Link>
-            <Link href="/#promo">Mode</Link>
-            <Link href="/#meches">Mèches</Link>
-            <Link href="/#bestsellers">Nouveautés</Link>
-            <Link href="/#footer">Contact</Link>
-          </nav>
+          <SearchBar />
           <div className="nav-actions">
-            <button type="button" className="icon-btn" aria-label="Rechercher">
-              <Icon name="i-search" />
-            </button>
             <AccountMenu />
             <button
               type="button"
@@ -58,13 +75,6 @@ export default function Header() {
               <Icon name="i-cart" />
               <span className="cart-badge">{count}</span>
             </button>
-            <Link
-              href="/#bestsellers"
-              className="btn btn-primary desktop-only"
-              style={{ marginLeft: 6 }}
-            >
-              Boutique
-            </Link>
             <button
               type="button"
               className="icon-btn burger"
@@ -76,7 +86,13 @@ export default function Header() {
           </div>
         </div>
 
-        <MobileSearch />
+        <nav className="wrap cat-nav" aria-label="Navigation principale">
+          {desktopLinks.map((l) => (
+            <Link key={l.label} href={l.href}>
+              {l.label}
+            </Link>
+          ))}
+        </nav>
 
         <div className={`mobile-panel ${navOpen ? "open" : ""}`}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -95,7 +111,7 @@ export default function Header() {
               gap: 6,
               marginTop: 36,
               fontSize: 21,
-              fontFamily: "var(--font-fraunces), serif",
+              fontFamily: "var(--font)",
             }}
           >
             {mobileLinks.map((l, i) => (

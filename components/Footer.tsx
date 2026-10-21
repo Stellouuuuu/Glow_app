@@ -7,8 +7,8 @@ const columns = [
     links: [
       { href: "/#categories", label: "Soins du visage" },
       { href: "/#categories", label: "Maquillage" },
-      { href: "/#promo", label: "Mode femme" },
-      { href: "/#meches", label: "Mèches & extensions" },
+      { href: "/#bestsellers", label: "Mode femme" },
+      { href: "/#bestsellers", label: "Mèches & extensions" },
     ],
   },
   {

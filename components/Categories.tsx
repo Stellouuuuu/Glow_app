@@ -1,12 +1,16 @@
+import Image from "next/image";
 import Icon from "./Icon";
+import { categoryPhotos, type CategoryPhoto } from "@/lib/category-photos";
 
-const categories = [
-  { href: "#bestsellers", icon: "i-leaf", label: "Soins du visage" },
-  { href: "#bestsellers", icon: "i-lips", label: "Maquillage" },
-  { href: "#promo", icon: "i-dress", label: "Mode femme" },
-  { href: "#meches", icon: "i-hair", label: "Mèches & extensions" },
-  { href: "#bestsellers", icon: "i-bag", label: "Accessoires" },
-  { href: "#bestsellers", icon: "i-perfume", label: "Parfums" },
+type Category = { href: string; label: string; icon?: string; photo?: CategoryPhoto };
+
+const categories: Category[] = [
+  { href: "#bestsellers", label: "Soins du visage", photo: categoryPhotos.soins },
+  { href: "#bestsellers", label: "Maquillage", photo: categoryPhotos.maquillage },
+  { href: "#bestsellers", label: "Mode femme", photo: categoryPhotos.mode },
+  { href: "#bestsellers", label: "Mèches & extensions", photo: categoryPhotos.meches },
+  { href: "#bestsellers", label: "Accessoires", photo: categoryPhotos.accessoires },
+  { href: "#bestsellers", label: "Parfums", photo: categoryPhotos.parfum },
 ];
 
 export default function Categories() {
@@ -22,7 +26,18 @@ export default function Categories() {
         {categories.map((c) => (
           <a key={c.label} className="cat-card" href={c.href}>
             <span className="cat-circle">
-              <Icon name={c.icon} />
+              {c.photo ? (
+                <Image
+                  src={c.photo.src}
+                  alt=""
+                  fill
+                  sizes="130px"
+                  className="cat-photo"
+                  style={{ objectPosition: c.photo.pos }}
+                />
+              ) : (
+                c.icon && <Icon name={c.icon} />
+              )}
             </span>
             <span>{c.label}</span>
           </a>

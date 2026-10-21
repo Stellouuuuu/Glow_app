@@ -3,7 +3,9 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import LiveRefresh from "@/components/LiveRefresh";
 import Icon from "@/components/Icon";
+import ProductGallery from "@/components/ProductGallery";
 import OrderButtons from "@/components/OrderButtons";
 import MobileTabBar from "@/components/MobileTabBar";
 import Sprite from "@/components/Sprite";
@@ -15,7 +17,7 @@ async function getProduct(slug: string) {
   const supabase = createClient();
   const { data } = await supabase
     .from("products")
-    .select(PRODUCT_SELECT)
+    .select(`${PRODUCT_SELECT}, photos`)
     .eq("slug", slug)
     .eq("is_active", true)
     .maybeSingle();
@@ -32,10 +34,12 @@ export default async function ProductPage({ params }: { params: { slug: string }
   if (!product) notFound();
 
   const outOfStock = product.stock <= 0;
+  const photos = product.photos?.length ? product.photos : product.photo_url ? [product.photo_url] : [];
 
   return (
     <div className="glow-root" id="top">
       <Sprite />
+      <LiveRefresh />
       <Header />
       <div className="wrap back-row">
         <BackButton fallback="/" />
@@ -45,9 +49,8 @@ export default async function ProductPage({ params }: { params: { slug: string }
           {product.badge && (
             <span className={`prod-tag${product.badge.startsWith("-") ? " sale" : ""}`}>{product.badge}</span>
           )}
-          {product.photo_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={product.photo_url} alt={product.name} className="prod-photo" />
+          {photos.length ? (
+            <ProductGallery photos={photos} alt={product.name} />
           ) : (
             <Icon name={illustrationFor(product.categories?.slug)} />
           )}

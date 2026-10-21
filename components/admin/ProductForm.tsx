@@ -8,6 +8,16 @@ import type { AdminProduct, Category } from "@/lib/types";
 const BUCKET = "product-photos";
 const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
 const NEW_CATEGORY = "__new__";
+const MAX_PHOTOS = 8;
+
+// Une photo du formulaire : déjà en ligne (url) ou en attente d'upload (file).
+type PhotoItem = { key: string; url: string; file?: File };
+
+const storagePath = (url: string) => {
+  const marker = `/${BUCKET}/`;
+  const i = url.indexOf(marker);
+  return i === -1 ? null : url.slice(i + marker.length);
+};
 
 type Props = {
   product: AdminProduct | null;
@@ -26,20 +36,36 @@ export default function ProductForm({ product, categories, onDone, onCancel }: P
   const [stock, setStock] = useState(product ? String(product.stock) : "0");
   const [badge, setBadge] = useState(product?.badge ?? "");
   const [isActive, setIsActive] = useState(product?.is_active ?? true);
-  const [photo, setPhoto] = useState<File | null>(null);
-  const [preview, setPreview] = useState(product?.photo_url ?? "");
+  const [photos, setPhotos] = useState<PhotoItem[]>(() => {
+    const urls = product?.photos?.length ? product.photos : product?.photo_url ? [product.photo_url] : [];
+    return urls.map((url) => ({ key: url, url }));
+  });
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
 
-  function onPhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith("image/")) return setError("Le fichier doit être une image.");
-    if (file.size > MAX_PHOTO_BYTES) return setError("La photo ne doit pas dépasser 5 Mo.");
+  function onPhotosChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    e.target.value = "";
+    if (!files.length) return;
+    if (files.some((f) => !f.type.startsWith("image/"))) return setError("Les fichiers doivent être des images.");
+    if (files.some((f) => f.size > MAX_PHOTO_BYTES)) return setError("Chaque photo ne doit pas dépasser 5 Mo.");
+    if (photos.length + files.length > MAX_PHOTOS) return setError(`Maximum ${MAX_PHOTOS} photos par produit.`);
     setError("");
-    setPhoto(file);
-    setPreview(URL.createObjectURL(file));
+    setPhotos((prev) => [
+      ...prev,
+      ...files.map((file) => ({ key: crypto.randomUUID(), url: URL.createObjectURL(file), file })),
+    ]);
   }
+
+  function movePhoto(i: number, dir: -1 | 1) {
+    setPhotos((prev) => {
+      const next = [...prev];
+      [next[i], next[i + dir]] = [next[i + dir], next[i]];
+      return next;
+    });
+  }
+
+  const removePhoto = (i: number) => setPhotos((prev) => prev.filter((_, j) => j !== i));
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -72,20 +98,26 @@ export default function ProductForm({ product, categories, onDone, onCancel }: P
       finalCategoryId = data.id;
     }
 
-    // 2. Upload de la photo dans Supabase Storage
-    let photoUrl = product?.photo_url ?? null;
-    let uploadedPath: string | null = null;
-    if (photo) {
-      const ext = (photo.name.split(".").pop() ?? "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
-      uploadedPath = `${crypto.randomUUID()}.${ext || "jpg"}`;
+    // 2. Upload des nouvelles photos dans Supabase Storage (l'ordre du formulaire est conservé)
+    const uploadedPaths: string[] = [];
+    const urls: string[] = [];
+    for (const item of photos) {
+      if (!item.file) {
+        urls.push(item.url);
+        continue;
+      }
+      const ext = (item.file.name.split(".").pop() ?? "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
+      const path = `${crypto.randomUUID()}.${ext || "jpg"}`;
       const { error } = await supabase.storage
         .from(BUCKET)
-        .upload(uploadedPath, photo, { contentType: photo.type, upsert: false });
+        .upload(path, item.file, { contentType: item.file.type, upsert: false });
       if (error) {
+        if (uploadedPaths.length) await supabase.storage.from(BUCKET).remove(uploadedPaths);
         setSaving(false);
         return setError(`Upload de la photo : ${error.message}`);
       }
-      photoUrl = supabase.storage.from(BUCKET).getPublicUrl(uploadedPath).data.publicUrl;
+      uploadedPaths.push(path);
+      urls.push(supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl);
     }
 
     // 3. Enregistrement du produit (le slug d'un produit existant ne change pas)
@@ -98,7 +130,8 @@ export default function ProductForm({ product, categories, onDone, onCancel }: P
       stock: stockNum,
       badge: badge.trim() || null,
       is_active: isActive,
-      photo_url: photoUrl,
+      photo_url: urls[0] ?? null,
+      photos: urls,
     };
 
     const { error } = product
@@ -107,19 +140,17 @@ export default function ProductForm({ product, categories, onDone, onCancel }: P
 
     if (error) {
       // Évite de laisser une photo orpheline si l'enregistrement a échoué
-      if (uploadedPath) await supabase.storage.from(BUCKET).remove([uploadedPath]);
+      if (uploadedPaths.length) await supabase.storage.from(BUCKET).remove(uploadedPaths);
       setSaving(false);
       return setError(
         error.code === "23505" ? "Un produit avec ce nom (ou ce lien) existe déjà." : error.message
       );
     }
 
-    // 4. Nettoyage de l'ancienne photo remplacée
-    if (uploadedPath && product?.photo_url) {
-      const marker = `/${BUCKET}/`;
-      const i = product.photo_url.indexOf(marker);
-      if (i !== -1) await supabase.storage.from(BUCKET).remove([product.photo_url.slice(i + marker.length)]);
-    }
+    // 4. Nettoyage des photos retirées du produit
+    const before = product?.photos?.length ? product.photos : product?.photo_url ? [product.photo_url] : [];
+    const removed = before.filter((u) => !urls.includes(u)).map(storagePath).filter((x): x is string => !!x);
+    if (removed.length) await supabase.storage.from(BUCKET).remove(removed);
 
     setSaving(false);
     onDone();
@@ -190,16 +221,32 @@ export default function ProductForm({ product, categories, onDone, onCancel }: P
         </div>
 
         <div className="admin-field admin-span2">
-          <label htmlFor="p-photo">Photo</label>
-          <div className="admin-photo">
-            {preview ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={preview} alt="Aperçu" className="admin-thumb admin-thumb-lg" />
-            ) : (
-              <span className="admin-thumb admin-thumb-lg admin-thumb-empty" />
-            )}
-            <input id="p-photo" type="file" accept="image/*" onChange={onPhotoChange} />
+          <label htmlFor="p-photo">
+            Photos ({photos.length}/{MAX_PHOTOS}) - la première est la photo de couverture
+          </label>
+          <div className="admin-photos">
+            {photos.map((p, i) => (
+              <div className="admin-photo-item" key={p.key}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={p.url} alt={`Photo ${i + 1}`} className="admin-thumb" />
+                {i === 0 && <span className="admin-photo-cover">Couverture</span>}
+                <div className="admin-photo-tools">
+                  <button type="button" aria-label="Déplacer à gauche" disabled={i === 0} onClick={() => movePhoto(i, -1)}>
+                    ←
+                  </button>
+                  <button type="button" aria-label="Retirer la photo" onClick={() => removePhoto(i)}>
+                    ✕
+                  </button>
+                  <button type="button" aria-label="Déplacer à droite" disabled={i === photos.length - 1} onClick={() => movePhoto(i, 1)}>
+                    →
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
+          {photos.length < MAX_PHOTOS && (
+            <input id="p-photo" type="file" accept="image/*" multiple onChange={onPhotosChange} style={{ marginTop: 10 }} />
+          )}
         </div>
       </div>
 

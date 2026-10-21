@@ -5,11 +5,11 @@ import Features from "@/components/Features";
 import Footer from "@/components/Footer";
 import Gallery from "@/components/Gallery";
 import Header from "@/components/Header";
+import LiveRefresh from "@/components/LiveRefresh";
 import Hero from "@/components/Hero";
-import Meches from "@/components/Meches";
 import Newsletter from "@/components/Newsletter";
-import Promo from "@/components/Promo";
 import MobileTabBar from "@/components/MobileTabBar";
+import SignupBanner from "@/components/SignupBanner";
 import Sprite from "@/components/Sprite";
 import { createClient } from "@/lib/supabase/server";
 import { PRODUCT_SELECT, type Product } from "@/lib/types";
@@ -25,18 +25,18 @@ export default async function Home({ searchParams }: { searchParams: { q?: strin
   return (
     <div className="glow-root" id="top" style={{ width: "100%" }}>
       <Sprite />
+      <LiveRefresh />
       <Header />
       <Hero />
       <Categories />
-      <Features />
       <Bestsellers products={products} query={query} />
-      <Promo />
-      <Meches />
+      <Features />
       <Gallery />
       <AppTeaser />
       <Newsletter />
       <Footer />
       <MobileTabBar />
+      <SignupBanner />
     </div>
   );
 }
