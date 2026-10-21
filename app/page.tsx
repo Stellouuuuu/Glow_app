@@ -1,4 +1,3 @@
-import AppTeaser from "@/components/AppTeaser";
 import Bestsellers from "@/components/Bestsellers";
 import Categories from "@/components/Categories";
 import Features from "@/components/Features";
@@ -32,7 +31,6 @@ export default async function Home({ searchParams }: { searchParams: { q?: strin
       <Bestsellers products={products} query={query} />
       <Features />
       <Gallery />
-      <AppTeaser />
       <Newsletter />
       <Footer />
       <MobileTabBar />
