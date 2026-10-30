@@ -51,7 +51,7 @@ export default function Header() {
           <span className="announce-item">
             <Icon name="i-refresh" />
             <span>
-              <strong>Retours faciles</strong> sous 7 jours
+              <strong>Retours faciles</strong> sous 24h
             </span>
           </span>
         </div>

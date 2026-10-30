@@ -2,7 +2,7 @@ import Icon from "./Icon";
 
 const features = [
   { icon: "i-truck", title: "Livraison rapide", sub: "Partout à Cotonou & environs" },
-  { icon: "i-refresh", title: "Retours faciles", sub: "7 jours pour changer d'avis" },
+  { icon: "i-refresh", title: "Retours faciles", sub: "24 h pour changer d'avis" },
   { icon: "i-shield", title: "Paiement sécurisé", sub: "Mobile Money & à la livraison" },
   { icon: "i-headset", title: "Support dévoué", sub: "On répond vite, avec le sourire" },
 ];
