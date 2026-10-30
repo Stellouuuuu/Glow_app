@@ -29,7 +29,7 @@ const desktopLinks = [
 
 export default function Header() {
   const [navOpen, setNavOpen] = useState(false);
-  const { count, add } = useCart();
+  const { count } = useCart();
   const close = () => setNavOpen(false);
 
   return (
@@ -66,15 +66,14 @@ export default function Header() {
           <SearchBar />
           <div className="nav-actions">
             <AccountMenu />
-            <button
-              type="button"
+            <Link
+              href="/panier"
               className="icon-btn"
               aria-label={`Panier, ${count} article${count > 1 ? "s" : ""}`}
-              onClick={add}
             >
               <Icon name="i-cart" />
-              <span className="cart-badge">{count}</span>
-            </button>
+              {count > 0 && <span className="cart-badge">{count}</span>}
+            </Link>
             <button
               type="button"
               className="icon-btn burger"

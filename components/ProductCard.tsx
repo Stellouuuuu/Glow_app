@@ -44,7 +44,7 @@ export default function ProductCard({ product }: { product: Product }) {
         </div>
       </Link>
       {!outOfStock && (
-        <button type="button" className="prod-mini" onClick={add} aria-label={`Ajouter ${product.name} au panier`}>
+        <button type="button" className="prod-mini" onClick={() => add(product)} aria-label={`Ajouter ${product.name} au panier`}>
           <Icon name="i-cart" />
         </button>
       )}

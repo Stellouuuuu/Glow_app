@@ -28,7 +28,11 @@ function LoginForm() {
     const supabase = createClient();
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error || !data.user) {
-      setError("E-mail ou mot de passe incorrect.");
+      setError(
+        error?.code === "email_not_confirmed"
+          ? "Ton e-mail n'est pas encore confirmé. Clique sur le lien reçu par e-mail (pense à regarder les spams)."
+          : "E-mail ou mot de passe incorrect."
+      );
       setLoading(false);
       return;
     }
