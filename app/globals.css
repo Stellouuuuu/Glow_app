@@ -449,3 +449,12 @@ a.stat-card:hover { background: var(--blush-deep); }
 .cart-summary .btn:disabled { opacity: .5; cursor: not-allowed; }
 .cart-note { margin: 0; text-align: center; font-size: 12.5px; color: var(--ink-soft); }
 @media (max-width: 900px) { .cart-summary { bottom: 64px; } }
+
+/* le menu compte est dans l'en-tête noir : texte sombre sur son fond blanc */
+header.site .account-pop { color: var(--ink); }
+header.site .account-pop .account-pop-title { color: var(--ink); }
+header.site .account-pop .btn-primary { color: #fff; }
+header.site .account-pop .btn-outline { color: var(--ink); border-color: var(--line-strong); }
+header.site .account-pop .btn-outline:hover { color: var(--rose); border-color: var(--rose); }
+header.site .account-pop .account-pop-link { color: var(--ink-soft); }
+header.site .account-pop .account-pop-link:hover { color: var(--rose); }
