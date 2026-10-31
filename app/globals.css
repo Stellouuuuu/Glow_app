@@ -8,7 +8,7 @@ body { margin: 0; background: #FFFBF8; }
 * { box-sizing: border-box; }
 .glow-root { font-family: var(--font); color: var(--ink); background: var(--cream); overflow-x: hidden; }
 .glow-root h1, .glow-root h2, .glow-root h3 { font-family: var(--font); margin: 0; letter-spacing: -0.01em; }
-.glow-root a { text-decoration: none; color: inherit; }
+.glow-root :where(a) { text-decoration: none; color: inherit; }
 .glow-root :where(button) { font-family: var(--font); cursor: pointer; border: none; background: none; }
 .glow-root ul { list-style: none; margin: 0; padding: 0; }
 .script { font-family: var(--font); }
@@ -238,7 +238,6 @@ footer.site { padding-block: clamp(40px, 6vw, 72px) 28px; border-top: 1px solid 
   .tab-bar a { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; font-weight: 500; color: var(--ink-soft); min-height: 44px; justify-content: center; }
   .tab-bar a .icon { width: 23px; height: 23px; }
   .tab-bar a.active { color: var(--rose); font-weight: 600; }
-  .signup-bar { bottom: calc(80px + env(safe-area-inset-bottom)); }
 }
 @media (max-width: 560px) {
   .foot-grid { grid-template-columns: 1fr; gap: 28px; }
@@ -458,3 +457,12 @@ header.site .account-pop .btn-outline { color: var(--ink); border-color: var(--l
 header.site .account-pop .btn-outline:hover { color: var(--rose); border-color: var(--rose); }
 header.site .account-pop .account-pop-link { color: var(--ink-soft); }
 header.site .account-pop .account-pop-link:hover { color: var(--rose); }
+
+@media (max-width: 900px) {
+  .foot-compact .foot-col { display: none; }
+  .foot-compact .foot-grid { grid-template-columns: 1fr; }
+  .foot-compact .foot-bottom { margin-top: 28px; flex-direction: column; align-items: flex-start; }
+}
+
+/* au-dessus de la barre du bas sur mobile (doit rester après la règle de base .signup-bar) */
+@media (max-width: 900px) { .signup-bar { bottom: calc(76px + env(safe-area-inset-bottom)); } }

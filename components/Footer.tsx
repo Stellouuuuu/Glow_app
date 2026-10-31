@@ -31,9 +31,10 @@ const columns = [
   },
 ];
 
-export default function Footer() {
+// compact : sur mobile, ne garde que la marque et les réseaux (la barre du bas fait déjà la navigation).
+export default function Footer({ compact = false }: { compact?: boolean }) {
   return (
-    <footer className="site wrap" id="footer">
+    <footer className={`site wrap${compact ? " foot-compact" : ""}`} id="footer">
       <div className="foot-grid">
         <div className="foot-brand">
           <Link href="/#top" className="brand">

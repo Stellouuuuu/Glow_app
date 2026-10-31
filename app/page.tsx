@@ -18,7 +18,11 @@ export default async function Home({ searchParams }: { searchParams: { q?: strin
   const supabase = createClient();
   let request = supabase.from("products").select(PRODUCT_SELECT).eq("is_active", true);
   if (query) request = request.ilike("name", `%${query}%`);
-  const { data } = await request.order("created_at", { ascending: false });
+  const [{ data }, { data: auth }] = await Promise.all([
+    request.order("created_at", { ascending: false }),
+    supabase.auth.getUser(),
+  ]);
+  const loggedIn = !!auth.user;
   const products = (data ?? []) as unknown as Product[];
 
   return (
@@ -30,9 +34,10 @@ export default async function Home({ searchParams }: { searchParams: { q?: strin
       <Categories />
       <Bestsellers products={products} query={query} />
       <Features />
-      <Gallery />
-      <Newsletter />
-      <Footer />
+      {/* Vitrine et inscription inutiles pour une cliente déjà connectée */}
+      {!loggedIn && <Gallery />}
+      {!loggedIn && <Newsletter />}
+      <Footer compact={loggedIn} />
       <MobileTabBar />
       <SignupBanner />
     </div>

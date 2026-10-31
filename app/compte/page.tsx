@@ -107,7 +107,7 @@ export default async function AccountPage() {
           </ul>
         )}
       </main>
-      <Footer />
+      <Footer compact />
       <MobileTabBar />
     </div>
   );
